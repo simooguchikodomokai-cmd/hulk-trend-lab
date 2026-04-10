@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HULK TREND LAB</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Noto+Sans+JP:wght@400;500;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f5f6f8;--white:#fff;--border:#e8eaed;--border2:#d1d5db;--accent:#16a34a;--al:#dcfce7;--ad:#14532d;--red:#dc2626;--rl:#fee2e2;--yel:#d97706;--yl:#fef3c7;--blue:#2563eb;--bl:#dbeafe;--text:#111827;--text2:#374151;--muted:#6b7280;--muted2:#9ca3af;--yt:#ff0000;--tt:#222;--ig:#c13584;--tw:#1d9bf0;}
+*{margin:0;padding:0;box-sizing:border-box;}html{font-size:14px;}
+body{background:var(--bg);color:var(--text);font-family:'Noto Sans JP',sans-serif;min-height:100vh;display:flex;flex-direction:column;}
+.topbar{background:var(--white);border-bottom:1px solid var(--border);height:52px;display:flex;align-items:center;padding:0 1.25rem;gap:.85rem;position:sticky;top:0;z-index:200;box-shadow:0 1px 3px rgba(0,0,0,.06);}
+.logo{font-family:'Bebas Neue',sans-serif;font-size:1.35rem;letter-spacing:.05em;color:var(--accent);white-space:nowrap;}
+.logo span{color:var(--text);}
+.tsearch{flex:1;max-width:480px;display:flex;gap:.45rem;}
+.tsearch input{flex:1;border:1px solid var(--border2);border-radius:6px;padding:.42rem .85rem;font-family:'Noto Sans JP',sans-serif;font-size:.9rem;outline:none;background:var(--bg);transition:border-color .15s;}
+.tsearch input:focus{border-color:var(--accent);background:#fff;}
+.tsearch input::placeholder{color:var(--muted2);}
+.btn-s{background:var(--accent);color:#fff;border:none;border-radius:6px;padding:.42rem 1.1rem;font-size:.84rem;font-weight:700;cursor:pointer;white-space:nowrap;}
+.btn-s:hover{background:#15803d;}.btn-s:disabled{opacity:.6;cursor:not-allowed;}
+.tright{display:flex;align-items:center;gap:.6rem;margin-left:auto;}
+.kpill{display:flex;align-items:center;gap:.3rem;font-family:'JetBrains Mono',monospace;font-size:.63rem;font-weight:700;padding:.22rem .6rem;border-radius:20px;cursor:pointer;border:none;}
+.kpill.ok{background:var(--al);color:var(--ad);}.kpill.ng{background:var(--rl);color:var(--red);}
+.kdot{width:5px;height:5px;border-radius:50%;flex-shrink:0;}
+.kpill.ok .kdot{background:var(--accent);}.kpill.ng .kdot{background:var(--red);}
+.btn-cfg{background:var(--bg);border:1px solid var(--border2);border-radius:6px;padding:.38rem .8rem;font-size:.76rem;cursor:pointer;color:var(--text2);}
+.layout{display:flex;flex:1;}
+.sidebar{width:248px;background:var(--white);border-right:1px solid var(--border);padding:1rem 0;flex-shrink:0;position:sticky;top:52px;height:calc(100vh - 52px);overflow-y:auto;}
+.slabel{font-size:.63rem;font-weight:700;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;padding:0 1rem .35rem;}
+.sitem{display:flex;align-items:center;gap:.55rem;padding:.52rem 1rem;cursor:pointer;font-size:.84rem;color:var(--text2);border-left:3px solid transparent;transition:all .12s;user-select:none;}
+.sitem:hover{background:var(--bg);}.sitem.active{background:var(--al);color:var(--ad);border-left-color:var(--accent);font-weight:700;}
+.sicon{font-size:.95rem;width:18px;text-align:center;}
+.shr{border:none;border-top:1px solid var(--border);margin:.6rem 1rem;}
+.pwrap{padding:.3rem .85rem;}
+.pchip{display:inline-block;background:var(--bg);border:1px solid var(--border2);border-radius:4px;padding:.2rem .58rem;font-size:.73rem;color:var(--text2);cursor:pointer;margin:.18rem .1rem;transition:all .12s;}
+.pchip:hover{border-color:var(--accent);color:var(--accent);background:var(--al);}
+.snsbtn2{display:flex;align-items:center;gap:.45rem;width:calc(100% - 2rem);margin:.3rem 1rem;background:var(--bg);border:1px solid var(--border2);border-radius:6px;padding:.48rem .75rem;font-size:.78rem;font-weight:700;color:var(--text2);cursor:pointer;transition:all .15s;}
+.snsbtn2:hover{border-color:var(--accent);color:var(--accent);}.snsbtn2:disabled{opacity:.5;cursor:not-allowed;}
+.stime{padding:0 1rem;font-size:.63rem;color:var(--muted2);margin-top:.25rem;}
+.main{flex:1;overflow-y:auto;padding:1.25rem 1.5rem 2.5rem;min-width:0;}
+.tab{display:none;}.tab.active{display:block;}
+.abanner{background:var(--yl);border:1px solid #fcd34d;border-radius:8px;padding:.72rem 1rem;font-size:.82rem;line-height:1.6;margin-bottom:1rem;display:flex;gap:.6rem;align-items:flex-start;}
+.sumrow{display:grid;grid-template-columns:repeat(4,1fr);gap:.72rem;margin-bottom:1.1rem;}
+.scard{background:var(--white);border:1px solid var(--border);border-radius:8px;padding:.85rem .95rem;}
+.scard .sl{font-size:.68rem;color:var(--muted);margin-bottom:.2rem;}
+.scard .sv{font-family:'Bebas Neue',sans-serif;font-size:1.95rem;letter-spacing:.02em;line-height:1;}
+.scard .ss{font-size:.68rem;color:var(--muted);margin-top:.15rem;}
+.scard.hl{background:var(--al);border-color:#86efac;}.scard.hl .sv{color:var(--ad);}
+.sech{display:flex;align-items:center;margin-bottom:.8rem;}
+.sech h2{font-size:.9rem;font-weight:700;display:flex;align-items:center;gap:.48rem;}
+.badge{font-size:.63rem;font-weight:700;padding:.12rem .48rem;border-radius:4px;background:var(--al);color:var(--ad);}
+.ttable{background:var(--white);border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:1.1rem;}
+.tth{display:grid;grid-template-columns:34px 1fr 95px 82px 72px 108px 135px;padding:.58rem .95rem;background:var(--bg);border-bottom:1px solid var(--border);font-size:.66rem;font-weight:700;color:var(--muted);}
+.ttr{display:grid;grid-template-columns:34px 1fr 95px 82px 72px 108px 135px;padding:.72rem .95rem;border-bottom:1px solid var(--border);align-items:center;transition:background .1s;}
+.ttr:last-child{border-bottom:none;}.ttr:hover{background:#fafafa;}
+.rnum{font-family:'Bebas Neue',sans-serif;font-size:1.1rem;color:var(--muted2);}.ttr.r1 .rnum{color:var(--accent);}
+.kwchip{display:inline-flex;background:var(--al);color:var(--ad);border-radius:4px;padding:.2rem .52rem;font-size:.78rem;font-weight:700;white-space:nowrap;}
+.stags{display:flex;gap:.25rem;flex-wrap:wrap;}
+.stag{font-size:.6rem;font-weight:700;padding:.13rem .42rem;border-radius:3px;}
+.stag.yt{background:#fee2e2;color:var(--yt);}.stag.tt{background:#f3f4f6;color:#333;}
+.stag.ig{background:#fce7f3;color:var(--ig);}.stag.tw{background:var(--bl);color:var(--tw);}
+.sbwrap{display:flex;align-items:center;gap:.45rem;}
+.sbar{flex:1;height:5px;background:var(--border);border-radius:3px;overflow:hidden;}
+.sfill{height:100%;background:var(--accent);border-radius:3px;}
+.snum{font-size:.75rem;font-weight:700;min-width:22px;text-align:right;}
+.cbadge{font-size:.68rem;font-weight:700;padding:.13rem .42rem;border-radius:4px;}
+.cbadge.up{background:var(--al);color:var(--ad);}.cbadge.new{background:var(--rl);color:var(--red);}.cbadge.mid{background:var(--yl);color:var(--yel);}
+.pcol{font-size:.76rem;color:var(--text2);}
+.hbadge{font-size:.66rem;font-weight:700;padding:.2rem .5rem;border-radius:4px;}
+.hbadge.open{background:var(--al);color:var(--ad);}.hbadge.exist{background:var(--bl);color:var(--blue);}.hbadge.partial{background:var(--yl);color:var(--yel);}
+.snsgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:.72rem;margin-bottom:1.1rem;}
+.snscard{background:var(--white);border:1px solid var(--border);border-radius:8px;overflow:hidden;}
+.snsch{display:flex;align-items:center;gap:.55rem;padding:.68rem .9rem;border-bottom:1px solid var(--border);}
+.snsch h3{font-size:.82rem;font-weight:700;}
+.snsst{margin-left:auto;font-family:'JetBrains Mono',monospace;font-size:.58rem;font-weight:700;padding:.13rem .48rem;border-radius:20px;}
+.snsst.waiting{background:#f3f4f6;color:var(--muted);}.snsst.loading{background:var(--yl);color:var(--yel);}
+.snsst.live{background:var(--al);color:var(--ad);}.snsst.error{background:var(--rl);color:var(--red);}
+.snsbody{padding:.45rem .9rem;min-height:155px;}
+.snsitem{display:flex;align-items:center;gap:.55rem;padding:.4rem 0;border-bottom:1px solid var(--border);font-size:.8rem;}
+.snsitem:last-child{border-bottom:none;}
+.snsrank{font-family:'JetBrains Mono',monospace;font-size:.63rem;color:var(--muted2);min-width:16px;}
+.gtwrap{background:var(--white);border:1px solid var(--border);border-radius:8px;padding:1rem 1.1rem;margin-bottom:1.1rem;}
+.gtlabel{font-size:.72rem;color:var(--muted);margin-bottom:.75rem;}
+.inggrid{display:grid;grid-template-columns:repeat(3,1fr);gap:.78rem;margin-bottom:1rem;}
+.ingcard{background:var(--white);border:1px solid var(--border);border-radius:8px;overflow:hidden;}
+.inghead{padding:.85rem;border-bottom:1px solid var(--border);}
+.ingname{font-size:.97rem;font-weight:700;margin-bottom:.22rem;}
+.ingorigin{font-size:.68rem;color:var(--muted);}
+.ingbody{padding:.75rem .88rem;font-size:.77rem;line-height:1.72;color:var(--text2);}
+.itag{display:inline-block;background:var(--bg);border:1px solid var(--border);border-radius:4px;padding:.13rem .48rem;font-size:.63rem;margin:.12rem .08rem;}
+.brow{display:flex;align-items:center;gap:.45rem;margin:.4rem 0;}
+.brlabel{font-size:.66rem;color:var(--muted);min-width:58px;}
+.br{flex:1;height:4px;background:var(--border);border-radius:2px;overflow:hidden;}
+.brfill{height:100%;border-radius:2px;}
+.propgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:.82rem;margin-bottom:1rem;}
+.propcard{background:var(--white);border:1px solid var(--border);border-radius:8px;overflow:hidden;transition:box-shadow .15s;}
+.propcard:hover{box-shadow:0 4px 14px rgba(0,0,0,.08);}
+.propcard.top{border-color:var(--accent);box-shadow:0 0 0 2px rgba(22,163,74,.12);}
+.phead{display:flex;align-items:flex-start;gap:.72rem;padding:.88rem;border-bottom:1px solid var(--border);}
+.pnum{font-family:'Bebas Neue',sans-serif;font-size:1.75rem;line-height:1;color:var(--muted2);flex-shrink:0;}
+.propcard.top .pnum{color:var(--accent);}
+.ptitle{font-size:.88rem;font-weight:700;line-height:1.4;}
+.psub{font-size:.7rem;color:var(--muted);margin-top:.2rem;}
+.mbadge{margin-left:auto;flex-shrink:0;font-size:.7rem;font-weight:700;padding:.24rem .58rem;border-radius:4px;background:var(--accent);color:#fff;}
+.tlabel{font-size:.6rem;font-weight:700;color:var(--accent);letter-spacing:.05em;margin-bottom:.25rem;}
+.prow{display:grid;grid-template-columns:repeat(3,1fr);gap:.45rem;padding:.72rem .88rem;border-bottom:1px solid var(--border);}
+.plab{font-size:.63rem;color:var(--muted);margin-bottom:.2rem;}
+.pval{font-family:'JetBrains Mono',monospace;font-size:.94rem;font-weight:700;}
+.pval.cost{color:var(--text2);}.pval.sell{color:var(--blue);}.pval.profit{color:var(--accent);}
+.ppts{padding:.72rem .88rem;font-size:.74rem;line-height:1.78;color:var(--text2);}
+.ppts li{margin-left:1.1rem;}
+.pmat{margin:0 .88rem .75rem;background:var(--bl);border-radius:6px;padding:.58rem .75rem;font-size:.71rem;color:var(--blue);line-height:1.65;}
+.repsec{background:var(--white);border:1px solid var(--border);border-radius:8px;padding:1.15rem;margin-bottom:.88rem;}
+.repsec h3{font-size:.9rem;font-weight:700;color:var(--ad);margin-bottom:.68rem;padding-bottom:.48rem;border-bottom:1px solid var(--border);}
+.repsec p,.repsec li{font-size:.82rem;line-height:1.85;color:var(--text2);}
+.repsec ul{padding-left:1.15rem;margin:.35rem 0;}
+.repsec strong{color:var(--text);}
+.genbtn{background:var(--accent);color:#fff;border:none;border-radius:8px;padding:.72rem 1.8rem;font-size:.88rem;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:.58rem;margin-bottom:1.1rem;}
+.genbtn:hover{background:#15803d;}.genbtn:disabled{opacity:.5;cursor:not-allowed;}
+.modal-ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.42);z-index:9999;align-items:center;justify-content:center;}
+.modal-ov.show{display:flex !important;}
+.modal{background:var(--white);border-radius:10px;padding:1.5rem;width:430px;max-width:95vw;box-shadow:0 20px 40px rgba(0,0,0,.16);}
+.modal h2{font-size:.97rem;font-weight:700;margin-bottom:.95rem;}
+.mrow{margin-bottom:.85rem;}
+.mrow label{display:block;font-size:.74rem;font-weight:700;color:var(--muted);margin-bottom:.32rem;}
+.mrow input{width:100%;border:1px solid var(--border2);border-radius:6px;padding:.52rem .75rem;font-family:'JetBrains Mono',monospace;font-size:.8rem;outline:none;transition:border-color .15s;}
+.mrow input:focus{border-color:var(--accent);}
+.macts{display:flex;gap:.58rem;justify-content:flex-end;margin-top:.95rem;}
+.bcnl{background:var(--bg);border:1px solid var(--border2);border-radius:6px;padding:.48rem .95rem;font-size:.82rem;cursor:pointer;}
+.bsave{background:var(--accent);color:#fff;border:none;border-radius:6px;padding:.48rem 1.15rem;font-size:.82rem;font-weight:700;cursor:pointer;}
+.spin{width:15px;height:15px;border:2px solid rgba(22,163,74,.2);border-top-color:var(--accent);border-radius:50%;animation:sp .8s linear infinite;display:inline-block;vertical-align:middle;}
+@keyframes sp{to{transform:rotate(360deg)}}
+.skel{background:linear-gradient(90deg,#f0f0f0 25%,#e8e8e8 50%,#f0f0f0 75%);background-size:200% 100%;animation:sh 1.5s infinite;border-radius:4px;height:13px;margin:6px 0;}
+@keyframes sh{0%{background-position:200% 0}100%{background-position:-200% 0}}
+.emsg{text-align:center;padding:2rem 1rem;color:var(--muted);font-size:.8rem;line-height:1.75;}
+.nodata{text-align:center;padding:1.5rem 1rem;color:var(--muted2);font-size:.8rem;line-height:1.6;}
+.nodata .ndi{font-size:1.4rem;margin-bottom:.4rem;}
+@media(max-width:900px){.sidebar{display:none;}.sumrow{grid-template-columns:repeat(2,1fr);}.propgrid,.inggrid,.snsgrid{grid-template-columns:1fr;}.tth,.ttr{grid-template-columns:28px 1fr 68px 58px;}.tth>*:nth-child(n+5),.ttr>*:nth-child(n+5){display:none;}}
+</style>
+</head>
+<body>
+<header class="topbar">
+  <div class="logo">HULK<span> TREND</span> LAB</div>
+  <div class="tsearch">
+    <input type="text" id="si" placeholder="キーワード検索（例：クレアチン、EAA、マグネシウム）">
+    <button class="btn-s" id="sb">検索</button>
+  </div>
+  <div class="tright">
+    <button class="kpill ng" id="yp"><span class="kdot"></span><span id="ypt">YouTube 未設定</span></button>
+    <button class="kpill ng" id="cp"><span class="kdot"></span><span id="cpt">Claude AI 未設定</span></button>
+    <button class="btn-cfg">⚙ API設定</button>
+  </div>
+</header>
+<div class="layout">
+  <aside class="sidebar">
+    <div style="margin-bottom:.5rem">
+      <div class="slabel">メニュー</div>
+      <div class="sitem active" data-tab="t-trend"><span class="sicon">📊</span>トレンド分析</div>
+      <div class="sitem" data-tab="t-ing"><span class="sicon">🧪</span>原料分析</div>
+      <div class="sitem" data-tab="t-prop"><span class="sicon">💡</span>商品提案</div>
+      <div class="sitem" data-tab="t-rep"><span class="sicon">📋</span>詳細レポート</div>
+    </div>
+    <hr class="shr">
+    <div style="margin-bottom:.5rem">
+      <div class="slabel">クイック検索</div>
+      <div class="pwrap">
+        <span class="pchip" data-q="EAA">EAA</span>
+        <span class="pchip" data-q="クレアチン">クレアチン</span>
+        <span class="pchip" data-q="プロテイン">プロテイン</span>
+        <span class="pchip" data-q="マグネシウム">マグネシウム</span>
+        <span class="pchip" data-q="シトルリン">シトルリン</span>
+        <span class="pchip" data-q="グルタミン">グルタミン</span>
+        <span class="pchip" data-q="L-カルニチン">L-カルニチン</span>
+        <span class="pchip" data-q="コラーゲン">コラーゲン</span>
+        <span class="pchip" data-q="亜鉛">亜鉛</span>
+        <span class="pchip" data-q="BCAA">BCAA</span>
+        <span class="pchip" data-q="筋トレ女子">筋トレ女子</span>
+        <span class="pchip" data-q="ダイエットサプリ">ダイエットサプリ</span>
+      </div>
+    </div>
+    <hr class="shr">
+    <div>
+      <div class="slabel">SNSトレンド</div>
+      <button class="snsbtn2" id="snsbtn">🔄 SNSトレンドを取得</button>
+      <div class="stime" id="stime"></div>
+    </div>
+  </aside>
+  <main class="main">
+
+    <div id="t-trend" class="tab active">
+      <div class="abanner" id="ab" style="display:none"><span>⚡</span><span id="abt"></span></div>
+      <div class="sumrow">
+        <div class="scard"><div class="sl">バズKW数</div><div class="sv" id="sk">—</div><div class="ss">今週検出</div></div>
+        <div class="scard"><div class="sl" style="color:var(--red)">急上昇</div><div class="sv" id="sr" style="color:var(--red)">—</div><div class="ss">前週比急増</div></div>
+        <div class="scard"><div class="sl" style="color:var(--yel)">競合アラート</div><div class="sv" id="sa" style="color:var(--yel)">—</div><div class="ss">新製品・動向</div></div>
+        <div class="scard hl"><div class="sl">KEY INSIGHT</div><div style="font-size:.8rem;font-weight:700;color:var(--ad);margin-top:.2rem" id="si2">検索して分析を開始</div></div>
+      </div>
+      <div class="sech"><h2>📊 バズワードランキング <span class="badge" id="tsrc"></span></h2></div>
+      <div class="ttable">
+        <div class="tth"><div>#</div><div>キーワード</div><div>主要SNS</div><div>スコア</div><div>変化</div><div>投稿量（推定）</div><div>HULK機会</div></div>
+        <div id="trows"><div class="emsg">キーワードを入力して検索してください</div></div>
+      </div>
+      <div class="sech"><h2>📱 SNS別トレンドワード</h2></div>
+      <div class="snsgrid">
+        <div class="snscard">
+          <div class="snsch"><span>🐦</span><h3 style="color:var(--tw)">X (Twitter)</h3><span class="snsst waiting" id="xst">WAITING</span></div>
+          <div class="snsbody" id="xb"><div class="nodata"><div class="ndi">🔄</div>「SNSトレンドを取得」を押してください</div></div>
+        </div>
+        <div class="snscard">
+          <div class="snsch"><span>🎵</span><h3 style="color:var(--tt)">TikTok</h3><span class="snsst waiting" id="ttst">WAITING</span></div>
+          <div class="snsbody" id="ttb"><div class="nodata"><div class="ndi">🔄</div>「SNSトレンドを取得」を押してください</div></div>
+        </div>
+        <div class="snscard">
+          <div class="snsch"><span>📸</span><h3 style="color:var(--ig)">Instagram</h3><span class="snsst waiting" id="igst">WAITING</span></div>
+          <div class="snsbody" id="igb"><div class="nodata"><div class="ndi">🔄</div>「SNSトレンドを取得」を押してください</div></div>
+        </div>
+      </div>
+      <div class="sech"><h2>📈 Googleトレンド</h2></div>
+      <div class="gtwrap">
+        <div class="gtlabel">検索ワードの過去12ヶ月トレンド推移（日本）</div>
+        <div id="gte"><div class="nodata"><div class="ndi">📈</div>キーワードを検索すると表示されます</div></div>
+      </div>
+    </div>
+
+    <div id="t-ing" class="tab">
+      <div class="sech"><h2>🧪 注目原料・成分分析</h2></div>
+      <button class="genbtn" id="ingbtn">⚡ AI原料分析を生成</button>
+      <div class="inggrid" id="ingg"><div class="emsg" style="grid-column:1/-1">キーワードを検索後、ボタンを押してください</div></div>
+    </div>
+
+    <div id="t-prop" class="tab">
+      <div class="sech"><h2>💡 AI商品提案 <span class="badge">実トレンドデータ × 原価 × 利益率</span></h2></div>
+      <button class="genbtn" id="propbtn">⚡ AI商品提案を生成</button>
+      <div class="propgrid" id="propg"><div class="emsg" style="grid-column:1/-1">キーワードを検索後、ボタンを押してください</div></div>
+    </div>
+
+    <div id="t-rep" class="tab">
+      <div class="sech"><h2>📋 詳細レポート</h2></div>
+      <button class="genbtn" id="repbtn">⚡ 詳細レポートを生成</button>
+      <div id="repc"><div class="emsg">キーワードを検索後、ボタンを押してください</div></div>
+    </div>
+
+  </main>
+</div>
+
+<div class="modal-ov" id="modal" style="display:none">
+  <div class="modal">
+    <h2>⚙ API Key 設定</h2>
+    <div class="mrow"><label>YouTube Data API Key</label><input type="password" id="yk" placeholder="AIzaSy..."></div>
+    <div class="mrow"><label>Anthropic Claude API Key</label><input type="password" id="ck" placeholder="sk-ant-..."></div>
+    <p style="font-size:.68rem;color:var(--muted);line-height:1.65;margin-top:.4rem">※ キーはブラウザのlocalStorageにのみ保存。外部送信はしません。</p>
+    <div class="macts">
+      <button class="bcnl">キャンセル</button>
+      <button class="bsave">保存する</button>
+    </div>
+  </div>
+</div>
+
+<script>
+var ytKey='',claudeKey='',currentQuery='';
+var snsData={x:[],tt:[],ig:[]};
+var collectedTrends=[];
+var gtReady=false;
+
+window.addEventListener('DOMContentLoaded',function(){
+  ytKey=localStorage.getItem('hulk_yt')||'';
+  claudeKey=localStorage.getItem('hulk_cl')||'';
+  if(ytKey)document.getElementById('yk').value=ytKey;
+  if(claudeKey)document.getElementById('ck').value=claudeKey;
+  updPills();
+  var s=document.createElement('script');
+  s.src='https://ssl.gstatic.com/trends_nrtr/3898_RC01/embed_loader.js';
+  s.onload=function(){gtReady=true;};
+  document.head.appendChild(s);
+
+  // ── ボタンイベント登録（onclick属性の代替） ──
+  // 検索ボタン
+  document.getElementById('sb').addEventListener('click',function(){doSearch();});
+  // 検索入力Enter
+  document.getElementById('si').addEventListener('keydown',function(e){if(e.key==='Enter')doSearch();});
+  // API設定ボタン群
+  document.getElementById('yp').addEventListener('click',function(){openModal();});
+  document.getElementById('cp').addEventListener('click',function(){openModal();});
+  document.querySelector('.btn-cfg').addEventListener('click',function(){openModal();});
+  // 保存・キャンセル
+  document.querySelector('.bsave').addEventListener('click',function(){saveKeys();});
+  document.querySelector('.bcnl').addEventListener('click',function(){closeModal();});
+  // SNS更新
+  document.getElementById('snsbtn').addEventListener('click',function(){refreshSNS();});
+  // AIボタン群
+  document.getElementById('ingbtn').addEventListener('click',function(){genIng();});
+  document.getElementById('propbtn').addEventListener('click',function(){genProp();});
+  document.getElementById('repbtn').addEventListener('click',function(){genRep();});
+  // サイドバーメニュー
+  document.querySelectorAll('.sitem').forEach(function(el){
+    el.addEventListener('click',function(){switchTab(el.getAttribute('data-tab'),el);});
+  });
+  // プリセットチップ
+  document.querySelectorAll('.pchip').forEach(function(el){
+    el.addEventListener('click',function(){setQ(el.getAttribute('data-q'));});
+  });
+});
+
+function openModal(){
+  var m=document.getElementById('modal');
+  m.style.display='flex';
+  m.classList.add('show');
+}
+function closeModal(){
+  var m=document.getElementById('modal');
+  m.style.display='none';
+  m.classList.remove('show');
+}
+document.getElementById('modal').addEventListener('click',function(e){
+  if(e.target===document.getElementById('modal'))closeModal();
+});
+
+function saveKeys(){
+  ytKey=document.getElementById('yk').value.trim();
+  claudeKey=document.getElementById('ck').value.trim();
+  localStorage.setItem('hulk_yt',ytKey);
+  localStorage.setItem('hulk_cl',claudeKey);
+  updPills();closeModal();
+}
+function updPills(){
+  var yp=document.getElementById('yp'),cp=document.getElementById('cp');
+  if(ytKey){yp.className='kpill ok';document.getElementById('ypt').textContent='YouTube ✓';}
+  else{yp.className='kpill ng';document.getElementById('ypt').textContent='YouTube 未設定';}
+  if(claudeKey){cp.className='kpill ok';document.getElementById('cpt').textContent='Claude AI ✓';}
+  else{cp.className='kpill ng';document.getElementById('cpt').textContent='Claude AI 未設定';}
+}
+function switchTab(id,el){
+  document.querySelectorAll('.tab').forEach(function(p){p.classList.remove('active');});
+  document.querySelectorAll('.sitem').forEach(function(b){b.classList.remove('active');});
+  document.getElementById(id).classList.add('active');
+  el.classList.add('active');
+}
+function setQ(q){document.getElementById('si').value=q;doSearch();}
+
+async function doSearch(){
+  var q=document.getElementById('si').value.trim();
+  if(!q)return;
+  currentQuery=q;collectedTrends=[];
+  var btn=document.getElementById('sb');
+  btn.disabled=true;btn.textContent='分析中...';
+  document.getElementById('trows').innerHTML='<div class="emsg"><span class="spin"></span> AI分析中（20〜40秒）...</div>';
+  document.getElementById('tsrc').textContent='';
+  document.getElementById('ab').style.display='none';
+  ['sk','sr','sa'].forEach(function(id){document.getElementById(id).textContent='—';});
+  document.getElementById('si2').textContent='分析中...';
+  await Promise.all([genTrendTable(q),renderGT(q)]);
+  btn.disabled=false;btn.textContent='検索';
+}
+
+function renderGT(query){
+  return new Promise(function(resolve){
+    var wrap=document.getElementById('gte');
+    wrap.innerHTML='<div class="nodata"><span class="spin"></span> 読み込み中...</div>';
+    var attempts=0;
+    var check=setInterval(function(){
+      attempts++;
+      if(window.trends&&trends.embed){
+        clearInterval(check);
+        wrap.innerHTML='';
+        try{
+          trends.embed.renderExploreWidgetTo(wrap,'TIMESERIES',
+            {comparisonItem:[{keyword:query,geo:'JP',time:'today 12-m'}],category:0,property:''},
+            {exploreQuery:'q='+encodeURIComponent(query)+'&geo=JP&date=today%2012-m',guestPath:'https://trends.google.co.jp:443/trends/embed/'});
+        }catch(e){wrap.innerHTML='<div class="nodata">Googleトレンド読み込み失敗</div>';}
+        resolve();
+      }else if(attempts>30){
+        clearInterval(check);
+        wrap.innerHTML='<div class="nodata">Googleトレンドがタイムアウトしました</div>';
+        resolve();
+      }
+    },500);
+  });
+}
+
+async function genTrendTable(query){
+  if(!claudeKey){
+    document.getElementById('trows').innerHTML='<div class="nodata"><div class="ndi">🔑</div>Claude APIキーを設定してください</div>';
+    return;
+  }
+  var prompt='あなたはフィットネス・サプリメント業界のSNSトレンドアナリストです。\n検索キーワード「'+query+'」に関連する日本のSNSバズワードランキングを分析してください。\n\n以下のJSON形式のみで回答してください。説明文・マークダウン不要。\n\n{"alert":"本日の注目1〜2文","kw_count":12,"rise_count":5,"alert_count":3,"insight":"最重要15文字以内","trends":[{"rank":1,"keyword":"キーワード","category":"カテゴリ","sns":["YouTube","TikTok"],"score":97,"change":"+380%","change_type":"up","posts":"約26,000件","hulk":"未展開→大機会","hulk_type":"open"}]}\n\ntrends配列は6〜8件必須。change_type: up/new/mid。hulk_type: open/exist/partial。sns配列値: YouTube/TikTok/Instagram/X のみ。JSONのみ出力。';
+  try{
+    var data=await callClaude(prompt,2500,false);
+    var text=getTexts(data);
+    if(!text)throw new Error('レスポンス空');
+    var jsonStr=extractJSON(text);
+    var json=JSON.parse(jsonStr);
+    renderTable(json);
+    document.getElementById('tsrc').textContent='AI分析';
+  }catch(e){
+    console.error('TrendTable:',e);
+    document.getElementById('trows').innerHTML='<div class="nodata"><div class="ndi">⚠️</div>データなし<br><small>'+esc(e.message)+'</small></div>';
+    document.getElementById('tsrc').textContent='';
+  }
+}
+
+function renderTable(j){
+  document.getElementById('sk').textContent=j.kw_count!=null?j.kw_count:'—';
+  document.getElementById('sr').textContent=j.rise_count!=null?j.rise_count:'—';
+  document.getElementById('sa').textContent=j.alert_count!=null?j.alert_count:'—';
+  document.getElementById('si2').textContent=j.insight||'—';
+  if(j.alert){document.getElementById('ab').style.display='flex';document.getElementById('abt').textContent=j.alert;}
+  collectedTrends=j.trends||[];
+  var sm={YouTube:'yt',TikTok:'tt',Instagram:'ig',X:'tw'};
+  var hi={open:'🟩 ',exist:'✓ ',partial:'△ '};
+  if(!collectedTrends.length){document.getElementById('trows').innerHTML='<div class="nodata">データなし</div>';return;}
+  document.getElementById('trows').innerHTML=collectedTrends.map(function(t){
+    return '<div class="ttr '+(t.rank===1?'r1':'')+'">'
+      +'<div class="rnum">'+t.rank+'</div>'
+      +'<div><span class="kwchip">'+esc(t.keyword)+'</span><br><span style="font-size:.63rem;color:var(--muted)">'+esc(t.category||'')+'</span></div>'
+      +'<div class="stags">'+(t.sns||[]).map(function(s){return '<span class="stag '+(sm[s]||'tw')+'">'+esc(s)+'</span>';}).join('')+'</div>'
+      +'<div class="sbwrap"><div class="sbar"><div class="sfill" style="width:'+(t.score||0)+'%"></div></div><span class="snum">'+(t.score||0)+'</span></div>'
+      +'<div><span class="cbadge '+(t.change_type||'up')+'">'+esc(t.change||'—')+'</span></div>'
+      +'<div class="pcol">'+esc(t.posts||'—')+'</div>'
+      +'<div><span class="hbadge '+(t.hulk_type||'partial')+'">'+(hi[t.hulk_type]||'')+esc(t.hulk||'—')+'</span></div>'
+      +'</div>';
+  }).join('');
+}
+
+async function refreshSNS(){
+  var btn=document.getElementById('snsbtn');
+  btn.disabled=true;btn.innerHTML='<span class="spin"></span> 取得中...';
+  ['xb','ttb','igb'].forEach(function(id){
+    document.getElementById(id).innerHTML='<div class="skel"></div><div class="skel" style="width:78%"></div><div class="skel" style="width:88%"></div>';
+  });
+  setSt('xst','LOADING','loading');setSt('ttst','LOADING','loading');setSt('igst','LOADING','loading');
+  await Promise.all([loadX(),loadTT(),loadIG()]);
+  document.getElementById('stime').textContent='最終更新: '+new Date().toLocaleTimeString('ja-JP');
+  btn.disabled=false;btn.innerHTML='🔄 SNSトレンドを更新';
+}
+
+// ── CORS プロキシ複数フォールバック ──
+var PROXIES=[
+  function(url){return 'https://api.allorigins.win/get?url='+encodeURIComponent(url);},
+  function(url){return 'https://api.codetabs.com/v1/proxy?quest='+encodeURIComponent(url);},
+  function(url){return 'https://corsproxy.io/?'+encodeURIComponent(url);}
+];
+
+async function fetchWithProxy(targetUrl,timeout){
+  timeout=timeout||10000;
+  for(var i=0;i<PROXIES.length;i++){
+    try{
+      var proxyUrl=PROXIES[i](targetUrl);
+      var r=await fetch(proxyUrl,{signal:AbortSignal.timeout(timeout)});
+      if(!r.ok)continue;
+      // allorigins は {contents:...}、他は直接テキスト
+      var ct=r.headers.get('content-type')||'';
+      var text='';
+      if(ct.includes('application/json')){
+        var j=await r.json();
+        text=j.contents||j.data||JSON.stringify(j);
+      }else{
+        text=await r.text();
+      }
+      if(text&&text.length>100)return text;
+    }catch(e){continue;}
+  }
+  throw new Error('全プロキシ失敗');
+}
+
+// X(Twitter) — trends24.in/japan
+async function loadX(){
+  setSt('xst','LOADING','loading');
+  try{
+    var html=await fetchWithProxy('https://trends24.in/japan/',9000);
+    // trends24のトレンドカードを解析
+    var items=[];
+    // パターン1: trend-card__list-item
+    var m1=[...html.matchAll(/trend-card__list-item[^>]*>\s*<a[^>]*>([^<]+)<\/a>/g)];
+    if(m1.length)items=m1.map(function(m){return m[1].trim();}).filter(Boolean);
+    // パターン2: #ハッシュタグ
+    if(!items.length){
+      var m2=[...html.matchAll(/#[\w぀-鿿゠-ヿ]+/g)];
+      items=[...new Set(m2.map(function(m){return m[0];}))];
+    }
+    // パターン3: <a> タグ内テキスト（短い文字列）
+    if(!items.length){
+      var m3=[...html.matchAll(/<a[^>]*>([^<]{2,25})<\/a>/g)];
+      items=m3.map(function(m){return m[1].trim();}).filter(function(s){return s.length>=2&&s.length<=20&&!/^(http|www|\.)/i.test(s);});
+    }
+    items=[...new Set(items)].slice(0,10);
+    if(!items.length)throw new Error('パース失敗');
+    renderSNS('xb',items,'#1d9bf0');
+    setSt('xst','LIVE','live');
+    snsData.x=items;
+  }catch(e){
+    console.warn('X trend error:',e.message);
+    document.getElementById('xb').innerHTML='<div class="nodata"><div class="ndi">⚠️</div>データなし<br><small style="font-size:.65rem;color:var(--muted2)">CORSエラーまたはサイト変更</small></div>';
+    setSt('xst','ERROR','error');
+    snsData.x=[];
+  }
+}
+
+// TikTok — Claude AI でトレンド生成（APIなしスクレイピング不可のため）
+async function loadTT(){
+  setSt('ttst','LOADING','loading');
+  if(!claudeKey){
+    document.getElementById('ttb').innerHTML='<div class="nodata"><div class="ndi">🔑</div>Claude APIキーを設定してください</div>';
+    setSt('ttst','ERROR','error');return;
+  }
+  try{
+    var prompt='現在（2025年）の日本のTikTokでフィットネス・サプリメント関連で流行しているハッシュタグを8個、JSONのみで返答してください。
+{"tags":["#タグ1","#タグ2","#タグ3","#タグ4","#タグ5","#タグ6","#タグ7","#タグ8"]}
+JSONのみ出力。';
+    var data=await callClaude(prompt,500,false);
+    var text=getTexts(data);
+    var json=JSON.parse(extractJSON(text));
+    var items=json.tags||[];
+    if(!items.length)throw new Error('データなし');
+    renderSNS('ttb',items,'#fe2c55');
+    setSt('ttst','AI','live');
+    snsData.tt=items;
+  }catch(e){
+    document.getElementById('ttb').innerHTML='<div class="nodata"><div class="ndi">⚠️</div>データなし</div>';
+    setSt('ttst','ERROR','error');snsData.tt=[];
+  }
+}
+
+// Instagram — Claude AI でトレンド生成
+async function loadIG(){
+  setSt('igst','LOADING','loading');
+  if(!claudeKey){
+    document.getElementById('igb').innerHTML='<div class="nodata"><div class="ndi">🔑</div>Claude APIキーを設定してください</div>';
+    setSt('igst','ERROR','error');return;
+  }
+  try{
+    var prompt='現在（2025年）の日本のInstagramでフィットネス・筋トレ・サプリメント関連で人気のハッシュタグを8個、JSONのみで返答してください。
+{"tags":["#タグ1","#タグ2","#タグ3","#タグ4","#タグ5","#タグ6","#タグ7","#タグ8"]}
+JSONのみ出力。';
+    var data=await callClaude(prompt,500,false);
+    var text=getTexts(data);
+    var json=JSON.parse(extractJSON(text));
+    var items=json.tags||[];
+    if(!items.length)throw new Error('データなし');
+    renderSNS('igb',items,'#c13584');
+    setSt('igst','AI','live');
+    snsData.ig=items;
+  }catch(e){
+    document.getElementById('igb').innerHTML='<div class="nodata"><div class="ndi">⚠️</div>データなし</div>';
+    setSt('igst','ERROR','error');snsData.ig=[];
+  }
+}
+function parseHash(html,limit){
+  var found=[...html.matchAll(/#[\w\u3040-\u9fff\u30a0-\u30ff\uff65-\uff9f]+/g)].map(function(m){return m[0];});
+  return[...new Set(found)].slice(0,limit);
+}
+function renderSNS(id,items,color){
+  document.getElementById(id).innerHTML=items.map(function(item,i){
+    return '<div class="snsitem"><span class="snsrank">'+String(i+1).padStart(2,'0')+'</span><span style="flex:1">'+esc(item)+'</span><span style="width:'+Math.max(12,62-i*7)+'px;height:3px;border-radius:2px;background:'+color+';display:inline-block"></span></div>';
+  }).join('');
+}
+function setSt(id,text,cls){var el=document.getElementById(id);el.textContent=text;el.className='snsst '+cls;}
+
+async function genIng(){
+  if(!claudeKey){alert('Claude APIキーを設定してください');return;}
+  var btn=document.getElementById('ingbtn');
+  btn.disabled=true;btn.innerHTML='<span class="spin"></span> 生成中...';
+  document.getElementById('ingg').innerHTML='<div class="emsg" style="grid-column:1/-1"><span class="spin"></span> AI分析中...</div>';
+  var trendKW=collectedTrends.map(function(t){return t.keyword;}).join('、')||currentQuery||'フィットネスサプリ';
+  var prompt='フィットネス・サプリメント業界の注目原料を分析してください。\nテーマ:「'+(currentQuery||'フィットネスサプリ')+'」\nトレンドKW: '+trendKW+'\n\n以下のJSONのみで3件返答。説明文不要。\n\n{"ingredients":[{"name":"原料名","origin":"由来・種別","description":"特徴と効能を2〜3文","tags":["t1","t2","t3"],"demand_score":85,"innovation_score":72,"cost_score":68,"trend_reason":"トレンド理由1文"}]}\n\nJSONのみ出力。';
+  try{
+    var data=await callClaude(prompt,2500,true);
+    var text=getTexts(data);
+    if(!text)throw new Error('レスポンス空');
+    var json=JSON.parse(extractJSON(text));
+    var ings=json.ingredients||[];
+    if(!ings.length)throw new Error('データなし');
+    document.getElementById('ingg').innerHTML=ings.map(function(ing){
+      return '<div class="ingcard">'
+        +'<div class="inghead"><div class="ingname">'+esc(ing.name)+'</div><div class="ingorigin">'+esc(ing.origin)+'</div></div>'
+        +'<div class="ingbody">'
+        +'<p style="margin-bottom:.58rem">'+esc(ing.description)+'</p>'
+        +'<div>'+(ing.tags||[]).map(function(t){return '<span class="itag">'+esc(t)+'</span>';}).join('')+'</div>'
+        +'<div style="margin-top:.68rem">'
+        +'<div class="brow"><span class="brlabel">需要スコア</span><div class="br"><div class="brfill" style="width:'+(ing.demand_score||0)+'%;background:var(--accent)"></div></div><span style="font-size:.68rem;font-weight:700;min-width:28px;text-align:right">'+(ing.demand_score||0)+'</span></div>'
+        +'<div class="brow"><span class="brlabel">革新性</span><div class="br"><div class="brfill" style="width:'+(ing.innovation_score||0)+'%;background:var(--blue)"></div></div><span style="font-size:.68rem;font-weight:700;min-width:28px;text-align:right">'+(ing.innovation_score||0)+'</span></div>'
+        +'<div class="brow"><span class="brlabel">コスト効率</span><div class="br"><div class="brfill" style="width:'+(ing.cost_score||0)+'%;background:var(--yel)"></div></div><span style="font-size:.68rem;font-weight:700;min-width:28px;text-align:right">'+(ing.cost_score||0)+'</span></div>'
+        +'</div>'
+        +'<p style="margin-top:.58rem;font-size:.71rem;color:var(--ad);font-weight:700">💡 '+esc(ing.trend_reason)+'</p>'
+        +'</div></div>';
+    }).join('');
+  }catch(e){
+    document.getElementById('ingg').innerHTML='<div class="nodata" style="grid-column:1/-1"><div class="ndi">⚠️</div>データなし<br><small>'+esc(e.message)+'</small></div>';
+  }
+  btn.disabled=false;btn.innerHTML='⚡ 再生成';
+}
+
+async function genProp(){
+  if(!claudeKey){alert('Claude APIキーを設定してください');return;}
+  var btn=document.getElementById('propbtn');
+  btn.disabled=true;btn.innerHTML='<span class="spin"></span> 生成中...';
+  document.getElementById('propg').innerHTML='<div class="emsg" style="grid-column:1/-1"><span class="spin"></span> AI商品提案生成中...</div>';
+  var trendInfo=collectedTrends.length?collectedTrends.map(function(t){return t.keyword+'(スコア'+t.score+')';}).join('、'):currentQuery||'フィットネスサプリ';
+  var prompt='HULK FACTORブランド向けサプリ新商品提案。\nテーマ:「'+(currentQuery||'フィットネスサプリ')+'」\nトレンド: '+trendInfo+'\n\n以下のJSONのみで4件返答。説明文不要。\n\n{"proposals":[{"rank":1,"is_top":true,"name":"商品名（原料名含む）","sub":"訴求ポイント","margin_pct":74,"cost":450,"sell":3980,"profit":3530,"points":["SNSトレンド根拠","競合状況","訴求ポイント","需要ドライバー"],"material_note":"原材料コストメモ"}]}\n\nis_topはrank1のみtrue。数値は整数。profit=sell-cost。JSONのみ出力。';
+  try{
+    var data=await callClaude(prompt,3000,true);
+    var text=getTexts(data);
+    if(!text)throw new Error('レスポンス空');
+    var json=JSON.parse(extractJSON(text));
+    var props=json.proposals||[];
+    if(!props.length)throw new Error('データなし');
+    document.getElementById('propg').innerHTML=props.map(function(p){
+      return '<div class="propcard '+(p.is_top?'top':'')+'">'
+        +'<div class="phead"><div class="pnum">'+p.rank+'</div>'
+        +'<div>'+(p.is_top?'<div class="tlabel">最推薦 — 今すぐ着手</div>':'')
+        +'<div class="ptitle">'+esc(p.name)+'</div><div class="psub">'+esc(p.sub)+'</div></div>'
+        +'<div class="mbadge">利益率 '+p.margin_pct+'%</div></div>'
+        +'<div class="prow">'
+        +'<div><div class="plab">原価/袋</div><div class="pval cost">¥'+Number(p.cost||0).toLocaleString()+'</div></div>'
+        +'<div><div class="plab">推奨売価</div><div class="pval sell">¥'+Number(p.sell||0).toLocaleString()+'</div></div>'
+        +'<div><div class="plab">粗利</div><div class="pval profit">¥'+Number(p.profit||0).toLocaleString()+'</div></div>'
+        +'</div>'
+        +'<ul class="ppts">'+(p.points||[]).map(function(pt){return '<li>'+esc(pt)+'</li>';}).join('')+'</ul>'
+        +(p.material_note?'<div class="pmat">'+esc(p.material_note)+'</div>':'')
+        +'</div>';
+    }).join('');
+  }catch(e){
+    document.getElementById('propg').innerHTML='<div class="nodata" style="grid-column:1/-1"><div class="ndi">⚠️</div>データなし<br><small>'+esc(e.message)+'</small></div>';
+  }
+  btn.disabled=false;btn.innerHTML='⚡ 再生成';
+}
+
+async function genRep(){
+  if(!claudeKey){alert('Claude APIキーを設定してください');return;}
+  var btn=document.getElementById('repbtn');
+  btn.disabled=true;btn.innerHTML='<span class="spin"></span> 生成中...';
+  document.getElementById('repc').innerHTML='<div class="emsg"><span class="spin"></span> 詳細レポート生成中（30〜60秒）...</div>';
+  var trendKW=collectedTrends.slice(0,6).map(function(t){return t.keyword;}).join('、')||currentQuery||'フィットネスサプリ';
+  var prompt='フィットネス・サプリメント業界の詳細市場レポートを日本語で作成してください。\nテーマ: 「'+(currentQuery||'フィットネスサプリ')+'」\nトレンドKW: '+trendKW+'\nX: '+(snsData.x.slice(0,4).join('、')||'なし')+'\nTikTok: '+(snsData.tt.slice(0,4).join('、')||'なし')+'\n\n以下4セクションをHTMLで出力。h3,p,ul,li,strongタグのみ使用。各セクションを<section>タグで囲む。\n1.市場概況と成長トレンド\n2.競合ブランド分析（3〜5社具体名）\n3.消費者インサイトとペインポイント\n4.HULK FACTORへの戦略的提言';
+  try{
+    var data=await callClaude(prompt,3500,true);
+    var text=getTexts(data);
+    if(!text)throw new Error('レスポンス空');
+    var parser=new DOMParser();
+    var doc=parser.parseFromString(text,'text/html');
+    var sections=doc.querySelectorAll('section');
+    var out=document.getElementById('repc');
+    out.innerHTML='';
+    if(sections.length>0){
+      sections.forEach(function(sec){
+        var card=document.createElement('div');
+        card.className='repsec';
+        card.innerHTML=sec.innerHTML;
+        out.appendChild(card);
+      });
+    }else{
+      var card=document.createElement('div');
+      card.className='repsec';
+      card.innerHTML=text;
+      out.appendChild(card);
+    }
+  }catch(e){
+    document.getElementById('repc').innerHTML='<div class="nodata"><div class="ndi">⚠️</div>データなし<br><small>'+esc(e.message)+'</small></div>';
+  }
+  btn.disabled=false;btn.innerHTML='⚡ 再生成';
+}
+
+async function callClaude(prompt,maxT,useSearch){
+  var body={model:'claude-sonnet-4-20250514',max_tokens:maxT,messages:[{role:'user',content:prompt}]};
+  if(useSearch)body.tools=[{type:'web_search_20250305',name:'web_search'}];
+  var res=await fetch('https://api.anthropic.com/v1/messages',{
+    method:'POST',
+    headers:{'Content-Type':'application/json','x-api-key':claudeKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+    body:JSON.stringify(body)
+  });
+  if(!res.ok){var err=await res.json().catch(function(){return{};});throw new Error(err.error&&err.error.message||'HTTP '+res.status);}
+  return res.json();
+}
+function getTexts(data){return(data.content||[]).filter(function(b){return b.type==='text';}).map(function(b){return b.text;}).join('');}
+function extractJSON(text){
+  var m1=text.match(/```(?:json)?\s*([\s\S]*?)```/);if(m1)return m1[1].trim();
+  var m2=text.match(/(\{[\s\S]*\})/);if(m2)return m2[1].trim();
+  var m3=text.match(/(\[[\s\S]*\])/);if(m3)return m3[1].trim();
+  return text.trim();
+}
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+</script>
+</body>
+</html>
